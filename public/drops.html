@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="description" content="Web site created using create-react-app" />
+    <link rel="apple-touch-icon" href="logo192.png" />
+    <!--
+      manifest.json provides metadata used when your web app is installed on a
+      user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
+    -->
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    <!--
+      Notice the use of %PUBLIC_URL% in the tags above.
+      It will be replaced with the URL of the `public` folder during the build.
+      Only files inside the `public` folder can be referenced from the HTML.
+
+      Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
+      work correctly both with client-side routing and a non-root public URL.
+      Learn how to configure a non-root public URL by running `npm run build`.
+    -->
+    <title>React App</title>
+
+
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.20.1/dist/phaser.min.js"></script>
+
+
+</head>
+
+<body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+    <!--
+      This HTML file is a template.
+      If you open it directly in the browser, you will see an empty page.
+
+      You can add webfonts, meta tags, or analytics to this file.
+      The build step will place the bundled scripts into the <body> tag.
+
+      To begin the development, run `npm start` or `yarn start`.
+      To create a production bundle, use `npm run build` or `yarn build`.
+    -->
+    <script>
+        var config = {
+            type: Phaser.AUTO,
+            width: 800,
+            height: 600,
+            physics: {
+                default: 'arcade',
+                arcade: {
+                    gravity: { y: 10 }
+                }
+            },
+            scene: {
+                preload: preload,
+                create: create,
+                update: update
+            }
+        };
+
+        var game = new Phaser.Game(config);
+
+        var bucket;
+        var drop;
+        var stars;
+        var cursors;
+        var score = 0;
+        var scoreText;
+
+        function preload() {
+            this.load.image('sky', 'sky.png');
+            this.load.image('ground', 'platform.png');
+            this.load.image('star', 'star.png');
+            this.load.image('bucket', 'bucket.png');
+            this.load.image('drop', 'drop.png');
+
+        }
+
+
+        function create() {
+
+            this.add.image(400, 300, 'sky');
+            scoreText = this.add.text(0, 0, 'Score : ' + score)
+            platforms = this.physics.add.staticGroup();
+            platforms.create(400, 568, 'ground').setScale(2).refreshBody();
+
+            bucket = this.physics.add.image(400, 400, 'bucket').setScale(0.4).setGravity(0, 200);
+            bucket.setCollideWorldBounds(true);
+
+            // drop = this.physics.add.image(400, 30, 'drop').setScale(0.1);
+
+            stars = this.physics.add.group({
+                key: 'star',
+                repeat: 11,
+                setXY: { x: 12, y: 0, stepX: 70 }
+            });
+
+            stars.children.iterate(function (child) {
+
+                child.setBounceY(Phaser.Math.FloatBetween(0.1, 0.3));
+                // child.body.allowGravity = false;
+                child.setGravity(0, Phaser.Math.FloatBetween(100, 150))
+                child.setCollideWorldBounds(true);
+            });
+
+
+            this.physics.add.collider(stars, platforms, (star, platforms) => {
+                //reset star
+                // setTimeout(()=>{
+                star.y = 10;
+                star.setGravity(0, Phaser.Math.FloatBetween(100, 150))
+                // }, 500)
+
+            }, null, this);
+            this.physics.add.collider(bucket, platforms);
+            this.physics.add.collider(bucket, stars, (bucket, star) => {
+                // star.disableBody(true, true);
+                star.y = 10;
+                star.setGravity(0, Phaser.Math.FloatBetween(100, 150))
+
+                score += 10;
+                scoreText.setText('Score : ' + score);
+            }, null, this);
+
+            console.log(bucket)
+
+            cursors = this.input.keyboard.createCursorKeys();
+
+            // this.physics.add.overlap(bucket, drop, () => {
+            //     console.log('lap')
+            // }, null, this);
+
+            // this.tweens.add({
+            //     targets: [this.drop],
+            //     y: 500,
+            //     duration: 200,
+            //     callbackScope: this
+            // })
+
+        }
+
+
+        function update() {
+            // drop.y += 2;
+            // if(drop.y > 600){
+            //     drop.y = 30;
+            // }
+
+            stars.children.iterate(function (child) {
+                child.angle += 1;
+            })
+            if (cursors.left.isDown) {
+                // bucket.setVelocityX(-160);
+                bucket.x -= 5;
+            }
+            else if (cursors.right.isDown) {
+                bucket.x += 5;
+            }
+        }
+
+    </script>
+</body>
+
+</html>
