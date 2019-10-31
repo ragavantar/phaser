@@ -1,3 +1,8 @@
+Phaser . JS
+Sample my first game offical
+Knife trial
+Drops
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
